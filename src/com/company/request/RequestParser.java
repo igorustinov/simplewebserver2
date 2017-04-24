@@ -3,7 +3,6 @@ package com.company.request;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -30,7 +29,6 @@ public class RequestParser {
         final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
 
         try {
-
             //Request-Line
             String line = bufferedReader.readLine();
             parseRequestLine(line);
@@ -39,25 +37,28 @@ public class RequestParser {
             line = bufferedReader.readLine();
             while (line.length() > 0) {
                 parseHeader(line);
+                line = bufferedReader.readLine();
             }
 
             //Body
-            line = bufferedReader.readLine();
-            while(line.length() > 0) {
-                parseBody(line);
+            if (bufferedReader.ready()) {
+                while(line != null) {
+                    parseBody(line);
+                    line = bufferedReader.readLine();
+                }
+                request.setContent(sb.toString().getBytes());
             }
-            request.setContent(sb.toString().getBytes());
+
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-
     }
 
     private void parseRequestLine(String line) {
         line = line.toUpperCase();
-        final String[] tokens = line.split("/s");
+        final String[] tokens = line.split(" ");
         if (tokens.length != 3) {
             throw new ParsingException("Invalid request line: " + line);
         }
@@ -82,6 +83,9 @@ public class RequestParser {
     }
 
     private void parseHeader(String line) {
+        if (line == null || line.length() == 0) {
+            return;
+        }
         final int colon = line.indexOf(":");
         if (colon == -1) {
             throw new ParsingException("Invalid header " + line);
@@ -99,11 +103,6 @@ public class RequestParser {
 
     private void parseBody(String line) {
         sb.append(line);
-        //todo implement bytes
-
-
-
     }
-
 
 }

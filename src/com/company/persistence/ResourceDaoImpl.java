@@ -30,7 +30,7 @@ public class ResourceDaoImpl implements ResourcesDao {
     @Override
     public boolean create(String path, byte[] bytes) {
         try {
-            Files.write(Paths.get(path), bytes);
+            Files.write(Paths.get(rootDirPath, path), bytes);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -41,7 +41,7 @@ public class ResourceDaoImpl implements ResourcesDao {
     @Override
     public byte[] read(String path) {
         try {
-            return Files.readAllBytes(Paths.get(path));
+            return Files.readAllBytes(Paths.get(rootDirPath, path));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -56,7 +56,7 @@ public class ResourceDaoImpl implements ResourcesDao {
     @Override
     public boolean delete(String path) {
         try {
-            return Files.deleteIfExists(Paths.get(path));
+            return Files.deleteIfExists(Paths.get(rootDirPath, path));
         } catch (IOException e) {
             e.printStackTrace();
             return false;

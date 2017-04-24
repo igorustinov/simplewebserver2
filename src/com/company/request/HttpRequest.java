@@ -1,7 +1,5 @@
 package com.company.request;
 
-import sun.misc.IOUtils;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -27,23 +25,10 @@ public class HttpRequest {
         headers = new HashMap<>();
     }
 
-    private byte[] bytes;
     private InputStream inputStream;
 
     public InputStream getStream() {
         return this.inputStream;
-    }
-
-    public byte[] getBytes() {
-        if (bytes == null) {
-            readBytes();
-        }
-        return bytes;
-    }
-
-    private void readBytes() {
-        final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
     }
 
     public Method getMethod() {
