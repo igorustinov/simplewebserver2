@@ -16,11 +16,11 @@ import java.net.Socket;
 /**
  * Created by igoru on 16-Apr-17.
  */
-public class Worker extends AbstractWorker {
+public class RequestHandlerWorker extends AbstractWorker {
 
     private RequestHandlerFactory requestHandlerFactory = new RequestHandlerFactory();
 
-    public Worker(Socket clientSocket) {
+    public RequestHandlerWorker(Socket clientSocket) {
         super(clientSocket);
     }
 

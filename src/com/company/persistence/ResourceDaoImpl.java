@@ -1,9 +1,13 @@
 package com.company.persistence;
 
+import com.company.request.NotExistException;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by igoru on 23-Apr-17.
@@ -11,6 +15,7 @@ import java.nio.file.Paths;
 public class ResourceDaoImpl implements ResourcesDao {
     private String rootDirPath;
     private File rootDir;
+    private static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public ResourceDaoImpl(String rootDirPath) {
         this(new File(rootDirPath));
@@ -28,12 +33,18 @@ public class ResourceDaoImpl implements ResourcesDao {
     }
 
     @Override
-    public boolean create(String path, byte[] bytes) {
+    public boolean create(String pathStr, byte[] bytes) {
         try {
-            Files.write(Paths.get(rootDirPath, path), bytes);
+            lock.writeLock().lock();
+            final Path path = Paths.get(rootDirPath, pathStr);
+            Files.createDirectories(path.getParent());
+            Files.createFile(path);
+            Files.write(path, bytes);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            lock.writeLock().unlock();
         }
         return true;
     }
@@ -41,9 +52,18 @@ public class ResourceDaoImpl implements ResourcesDao {
     @Override
     public byte[] read(String path) {
         try {
-            return Files.readAllBytes(Paths.get(rootDirPath, path));
+            lock.readLock().lock();
+            final Path existing = Paths.get(rootDirPath, path);
+            final File file = existing.toFile();
+            if (file.exists() && file.isFile()) {
+                return Files.readAllBytes(existing);
+            } else {
+                throw new NotExistException();
+            }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            lock.readLock().unlock();
         }
         return null;
     }
@@ -56,10 +76,23 @@ public class ResourceDaoImpl implements ResourcesDao {
     @Override
     public boolean delete(String path) {
         try {
+            lock.writeLock().lock();
             return Files.deleteIfExists(Paths.get(rootDirPath, path));
         } catch (IOException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    private Path getPath(String pathString) {
+        try {
+            final Path existing = Paths.get(rootDirPath, pathString);
+            final File file = existing.toFile();
+            return existing;
+        } catch (Exception ex) {
+            throw new NotExistException(ex);
         }
     }
 }

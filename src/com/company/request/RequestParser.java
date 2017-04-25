@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Created by igoru on 23-Apr-17.
@@ -41,14 +42,13 @@ public class RequestParser {
             }
 
             //Body
-            if (bufferedReader.ready()) {
-                while(line != null) {
-                    parseBody(line);
-                    line = bufferedReader.readLine();
-                }
-                request.setContent(sb.toString().getBytes());
+            while(bufferedReader.ready()) {
+                line = bufferedReader.readLine();
+                sb.append(line);
             }
-
+            if (sb.length() > 0) {
+                request.setContent(sb.toString().getBytes(StandardCharsets.UTF_8));
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,19 +60,19 @@ public class RequestParser {
         line = line.toUpperCase();
         final String[] tokens = line.split(" ");
         if (tokens.length != 3) {
-            throw new ParsingException("Invalid request line: " + line);
+            throw new ParseException("Invalid request line: " + line);
         }
 
         try {
             request.setMethod(Method.valueOf(tokens[0]));
         } catch (IllegalArgumentException e) {
-            throw new ParsingException("Not supported HTTP method");
+            throw new ParseException("Not supported HTTP method");
         }
 
         try {
             request.setUri(new URI(tokens[1]));
         } catch (URISyntaxException e) {
-            throw new ParsingException("Invalid URI");
+            throw new ParseException("Invalid URI");
         }
 
         if (HttpRequest.HTTP_1_1.equals(tokens[2])) {
@@ -88,21 +88,16 @@ public class RequestParser {
         }
         final int colon = line.indexOf(":");
         if (colon == -1) {
-            throw new ParsingException("Invalid header " + line);
+            throw new ParseException("Invalid header " + line);
         }
         String key = line.substring(0, colon - 1).trim();
         if (key.length() == 0) {
-            throw new ParsingException("Invalid header " + line);
+            throw new ParseException("Invalid header " + line);
         }
 
         String value = line.substring(colon, line.length() - 1).trim();
         if (value.length() == 0) {
-            throw new ParsingException("Invalid header " + line);
+            throw new ParseException("Invalid header " + line);
         }
     }
-
-    private void parseBody(String line) {
-        sb.append(line);
-    }
-
 }

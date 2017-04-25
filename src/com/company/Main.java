@@ -7,8 +7,8 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-	// write your code here
-        SocketAcceptor socketAcceptor = new SocketAcceptor(8081);
+
+        SocketAcceptor socketAcceptor = new SocketAcceptor(Configuration.INSTANCE.getPortNumber());
         Scanner in = new Scanner(new BufferedReader(new InputStreamReader(System.in)));
         while(in.hasNext()) {
             final String next = in.next();
@@ -27,12 +27,5 @@ public class Main {
             }
         }
 
-//        try {
-//            Thread.sleep(20 * 1000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        System.out.println("stopping server");
-//        socketAcceptor.stop();
     }
 }
