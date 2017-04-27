@@ -40,12 +40,20 @@ public class SocketAcceptor implements Runnable {
     }
 
     public void start() {
-        new Thread(this).start();
+        if (!started) {
+            final Thread thread = new Thread(this);
+            thread.setDaemon(true);
+            thread.start();
+            started = true;
+        }
     }
 
 
     public void stop() {
-        this.stopped = true;
+        if (!started) {
+            return;
+        }
+
         try {
             executor.shutdown();
             socket.close();
@@ -56,6 +64,8 @@ public class SocketAcceptor implements Runnable {
             e.printStackTrace();
         } finally {
             executor.shutdownNow();
+            this.stopped = true;
+            this.started = false;
         }
     }
 

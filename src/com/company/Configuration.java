@@ -14,6 +14,10 @@ public class Configuration {
         return portNumber;
     }
 
+    public void setPortNumber(int portNumber) {
+        this.portNumber = portNumber;
+    }
+
     public int getMaxNumOfThreads() {
         return maxNumOfThreads;
     }

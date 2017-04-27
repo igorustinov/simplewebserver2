@@ -25,8 +25,14 @@ public class ResourceDaoImpl implements ResourcesDao {
         if (rootDir == null) {
             throw new NullPointerException("rootDir is null");
         }
-        if (!rootDir.exists() || !rootDir.canWrite()) {
-            throw new IllegalArgumentException("illegal rootDirPath");
+        if (!rootDir.exists()) {
+            try {
+                Files.createDirectory(rootDir.toPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new IllegalArgumentException("Failed to create rootDirPath");
+            }
+
         }
         this.rootDir = rootDir;
         this.rootDirPath = rootDir.getPath();
@@ -84,16 +90,6 @@ public class ResourceDaoImpl implements ResourcesDao {
             return false;
         } finally {
             lock.writeLock().unlock();
-        }
-    }
-
-    private Path getPath(String pathString) {
-        try {
-            final Path existing = Paths.get(rootDirPath, pathString);
-            final File file = existing.toFile();
-            return existing;
-        } catch (Exception ex) {
-            throw new NotExistException(ex);
         }
     }
 }

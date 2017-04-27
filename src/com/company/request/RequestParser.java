@@ -36,7 +36,7 @@ public class RequestParser {
 
             //Header
             line = bufferedReader.readLine();
-            while (line.length() > 0) {
+            while (line != null && line.length() > 0) {
                 parseHeader(line);
                 line = bufferedReader.readLine();
             }
@@ -59,11 +59,6 @@ public class RequestParser {
                 }
             }
 
-//            while(bufferedReader.ready()) {
-//
-//                line = bufferedReader.readLine();
-//                sb.append(line);
-//            }
             if (sb.length() > 0) {
                 request.setContent(sb.toString().getBytes(StandardCharsets.UTF_8));
             }
@@ -119,8 +114,4 @@ public class RequestParser {
         }
         request.addHeader(key, value);
     }
-
-//    private void parseLine(BufferedReader reader) {
-//        reader.
-//    }
 }

@@ -22,6 +22,8 @@ public class GetFileHandler extends AbstractFileRequestHandler {
             response.setStatusLine(Responses.HTTP_200);
         } catch (NotExistException e) {
             response.setStatusLine(Responses.HTTP_404);
+            response.addHeader("Content-Type", "text/html");
+            response.append("<html><head>202 Not Found</head><body><p>No luck. Try to post something</p></body></html>");
         }
 
     }
