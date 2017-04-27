@@ -42,10 +42,28 @@ public class RequestParser {
             }
 
             //Body
-            while(bufferedReader.ready()) {
-                line = bufferedReader.readLine();
-                sb.append(line);
+            if (Method.POST == request.getMethod()) {
+                final String contentLengthStr = request.getHeaderValue("Content-Length");
+                if (contentLengthStr != null) {
+                    int contentLength = Integer.parseInt(contentLengthStr);
+                    for (int i = 0; i < contentLength; i++) {
+                        if (!bufferedReader.ready()) {
+                            break;
+                        }
+                        int read = bufferedReader.read();
+                        if (read < 0) {
+                            break;
+                        }
+                        sb.append((char)read);
+                    }
+                }
             }
+
+//            while(bufferedReader.ready()) {
+//
+//                line = bufferedReader.readLine();
+//                sb.append(line);
+//            }
             if (sb.length() > 0) {
                 request.setContent(sb.toString().getBytes(StandardCharsets.UTF_8));
             }
@@ -90,14 +108,19 @@ public class RequestParser {
         if (colon == -1) {
             throw new ParseException("Invalid header " + line);
         }
-        String key = line.substring(0, colon - 1).trim();
+        String key = line.substring(0, colon).trim();
         if (key.length() == 0) {
             throw new ParseException("Invalid header " + line);
         }
 
-        String value = line.substring(colon, line.length() - 1).trim();
+        String value = line.substring(colon + 1, line.length()).trim();
         if (value.length() == 0) {
             throw new ParseException("Invalid header " + line);
         }
+        request.addHeader(key, value);
     }
+
+//    private void parseLine(BufferedReader reader) {
+//        reader.
+//    }
 }

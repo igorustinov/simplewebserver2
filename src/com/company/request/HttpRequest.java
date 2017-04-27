@@ -51,6 +51,10 @@ public class HttpRequest {
         return new HashMap<>(headers);
     }
 
+    public String getHeaderValue(String header) {
+        return headers.get(header);
+    }
+
     public void addHeader(String key, String value) {
         headers.put(key, value);
     }

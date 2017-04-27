@@ -3,6 +3,7 @@ package com.company.handlers;
 import com.company.request.HttpRequest;
 import com.company.request.Method;
 import com.company.response.HttpResponse;
+import com.company.response.Responses;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
@@ -22,5 +23,6 @@ public class UpdateFileHandler extends AbstractFileRequestHandler{
         } else {
             throw new NotImplementedException();
         }
+        response.setStatusLine(Responses.HTTP_200);
     }
 }

@@ -38,6 +38,7 @@ public class ResourceDaoImpl implements ResourcesDao {
             lock.writeLock().lock();
             final Path path = Paths.get(rootDirPath, pathStr);
             Files.createDirectories(path.getParent());
+            Files.deleteIfExists(path);
             Files.createFile(path);
             Files.write(path, bytes);
         } catch (IOException e) {
